@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
 import java.util.List;
@@ -14,11 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VendaDTO {
+public class VendaDTO  {
 
     private Long id;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date data;
-    private String produtos;
+    private List<ProdutosVendaDTO> produtos;
     private Double valorTotal;
 }

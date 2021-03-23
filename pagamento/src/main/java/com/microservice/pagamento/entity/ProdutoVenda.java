@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,10 +30,11 @@ public class ProdutoVenda implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY )
     private Long id;
 
+
     @Column(name = "id_produto", nullable = false, length = 10 )
     private Long idProduto;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn( name = "id_venda")
     private Venda venda;
 

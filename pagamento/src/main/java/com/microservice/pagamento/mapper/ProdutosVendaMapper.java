@@ -4,19 +4,25 @@ import com.microservice.pagamento.dtos.PageableDTO;
 import com.microservice.pagamento.dtos.ProdutosVendaDTO;
 import com.microservice.pagamento.entity.ProdutoVenda;
 import com.microservice.pagamento.entity.Venda;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 public class ProdutosVendaMapper {
 
-    public static ProdutosVendaDTO toProdutoDTO( ProdutoVenda produtoVenda ) {
-        return ProdutosVendaDTO.builder()
+    public static ProdutoVenda toProdutoDTO( ProdutoVenda produtoVenda ) {
+        return ProdutoVenda.builder()
                 .id( produtoVenda.getId() )
                 .idProduto( produtoVenda.getIdProduto() )
                 .quantidade( produtoVenda.getQuantidade() )
                 .build();
     }
+
+    public static ProdutoVenda create(ProdutosVendaDTO produtosVendaDTO) {
+        return new ModelMapper().map(produtosVendaDTO, ProdutoVenda.class);
+    }
+
 
     public static ProdutoVenda toProdutoEntity( ProdutosVendaDTO produtosVendaDTO ) {
         return ProdutoVenda.builder()

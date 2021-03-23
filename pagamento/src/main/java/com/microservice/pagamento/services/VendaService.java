@@ -4,8 +4,10 @@ import com.microservice.pagamento.dtos.VendaDTO;
 import com.microservice.pagamento.entity.ProdutoVenda;
 import com.microservice.pagamento.entity.Venda;
 import com.microservice.pagamento.exception.ResourceNotFoundException;
+import com.microservice.pagamento.mapper.ProdutosVendaMapper;
 import com.microservice.pagamento.mapper.VendaMapper;
 import com.microservice.pagamento.repositories.ProdutoVendaRepository;
+import com.microservice.pagamento.repositories.ProdutosRepository;
 import com.microservice.pagamento.repositories.VendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,17 +24,21 @@ public class VendaService {
     private VendaRepository vendaRepository;
     @Autowired
     private ProdutoVendaRepository produtoVendaRepository;
+    @Autowired
+    private ProdutosRepository produtosRepository;
 
     public VendaDTO save( VendaDTO vendaDTO) {
-        Venda venda =  vendaRepository.save( VendaMapper.toProdutoEntity( vendaDTO ) );
-        List< ProdutoVenda > produtosSalvo = new ArrayList<>();
-        venda.getProdutos().forEach( p -> {
-            ProdutoVenda pv = p;
-            pv.setVenda( venda );
-            produtosSalvo.add( produtoVendaRepository.save( pv ) );
-        } );
-        venda.setProdutos( produtosSalvo );
-        return VendaMapper.toProdutoDTO( venda );
+        Venda venda = vendaRepository.save(VendaMapper.createEntity(vendaDTO));
+
+        List<ProdutoVenda> produtosSalvos =  new ArrayList<>();
+        vendaDTO.getProdutos().forEach(p -> {
+            ProdutoVenda pv = ProdutosVendaMapper.create(p);
+            pv.setVenda(venda);
+            produtosSalvos.add(produtoVendaRepository.save(pv));
+        });
+        venda.setProdutos(produtosSalvos);
+
+        return VendaMapper.create(venda);
     }
 
     public Page<Venda> findAll( Pageable pageable) {

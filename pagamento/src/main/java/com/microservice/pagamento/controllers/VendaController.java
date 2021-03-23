@@ -1,6 +1,7 @@
 package com.microservice.pagamento.controllers;
 
 import com.microservice.pagamento.dtos.PageableDTO;
+
 import com.microservice.pagamento.dtos.VendaDTO;
 import com.microservice.pagamento.entity.Venda;
 import com.microservice.pagamento.mapper.VendaMapper;
@@ -27,9 +28,10 @@ public class VendaController {
     private VendaService vendaService;
 
     @PostMapping
-    public VendaDTO saveProdutos( @RequestBody @Validated VendaDTO vendaDTO ) {
-        vendaService.save( vendaDTO );
-        return vendaDTO;
+    public ResponseEntity<VendaDTO> saveProdutos( @RequestBody @Validated VendaDTO vendaDTO ) {
+
+        final VendaDTO venda = vendaService.save(vendaDTO );
+        return new ResponseEntity<>( venda, HttpStatus.CREATED );
     }
 
     @GetMapping
@@ -44,7 +46,7 @@ public class VendaController {
     @GetMapping(value = "/{id}")
     public ResponseEntity< VendaDTO > findProdutoById( @PathVariable Long id ) {
         Venda venda = vendaService.findProdutoById( id );
-        VendaDTO produtosDTO = VendaMapper.toProdutoDTO( venda );
+        VendaDTO produtosDTO = VendaMapper.userEntityToDto( venda );
         return new ResponseEntity( produtosDTO, HttpStatus.OK);
 
     }
