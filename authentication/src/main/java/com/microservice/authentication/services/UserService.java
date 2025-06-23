@@ -4,33 +4,50 @@ import com.microservice.authentication.dtos.UserDTO;
 import com.microservice.authentication.entity.User;
 import com.microservice.authentication.mapper.UserMapper;
 import com.microservice.authentication.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.microservice.authentication.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
+    public User authenticate(UserDTO userDTO) {
+
+        User user = userRepository.findByUsername(userDTO.getUsername());
+        if (user == null) {
+            throw new RuntimeException("User not found for email: " + userDTO.getUsername());
+        }
+
+        boolean passwordMatch = passwordEncoder.matches(userDTO.getPassword(), user.getPassword());
+        if (!passwordMatch) {
+            throw new RuntimeException("Invalid password");
+        }
+        return user;
+    }
     @Override
-    public UserDetails loadUserByUsername( String username ) throws UsernameNotFoundException {
-        var user  = userRepository.findByUsername( username );
-        if( user != null ){
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        var user = userRepository.findByUsername(username);
+        if (user != null) {
             return user;
-        }else {
-            throw new UsernameNotFoundException( "Usuário" + username + " não encontrado!" );
+        } else {
+            throw new UsernameNotFoundException("Usuário" + username + " não encontrado!");
         }
     }
 
-    public User saveUser( UserDTO userDTO ) {
+    public User saveUser(UserDTO userDTO) {
         User user;
-        user = userRepository.save( UserMapper.toUser( userDTO ) );
+        user = userRepository.save(userMapper.toUser(userDTO));
         return user;
     }
 }
