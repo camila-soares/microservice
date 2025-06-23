@@ -1,32 +1,33 @@
 package com.microservice.pagamento.services;
 
 import com.microservice.pagamento.dtos.ProdutosDTO;
-import com.microservice.pagamento.entity.Produtos;
+import com.microservice.pagamento.entity.Pedido;
 import com.microservice.pagamento.exception.ResourceNotFoundException;
 import com.microservice.pagamento.mapper.ProdutosMapper;
-import com.microservice.pagamento.repositories.ProdutosRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.microservice.pagamento.repositories.PedidoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class ProdutosService {
 
-    @Autowired
-    private ProdutosRepository produtosRepository;
+
+    private final PedidoRepository pedidoRepository;
 
 
-    public Produtos save( Produtos produtosDTO ) {
-        return produtosRepository.save( produtosDTO );
+    public Pedido save(Pedido pedido ) {
+        return pedidoRepository.save( pedido );
 
     }
 
-    private ProdutosDTO convertToProdutoDTO( Produtos produtos ) {
-        return ProdutosMapper.toProdutoDTO( produtos );
+    private ProdutosDTO convertToProdutoDTO(Pedido pedido ) {
+        return ProdutosMapper.toProdutoDTO( pedido );
     }
 
-    public Produtos findProdutoById( Long id ) {
-        return produtosRepository.findById( id )
+    public Pedido findProdutoById( Long id ) {
+        return pedidoRepository.findById(String.valueOf(id))
                 .orElseThrow( () -> new ResourceNotFoundException( "Produto nao encontrado" ) );
     }
 }

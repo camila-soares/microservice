@@ -4,19 +4,17 @@ import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MessageConfig {
 
-    @Value( "${produtos.rabbitmq.exchange}" )
-    String exchange;
+    public static String EXCHANGE_NAME ="produtos.exchange";
 
     @Bean
     public Exchange declareExchange() {
-        return ExchangeBuilder.directExchange( exchange ).durable( true ).build();
+        return ExchangeBuilder.directExchange( EXCHANGE_NAME ).durable( true ).build();
     }
 
     @Bean

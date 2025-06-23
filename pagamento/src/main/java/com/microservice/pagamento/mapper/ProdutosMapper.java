@@ -2,26 +2,26 @@ package com.microservice.pagamento.mapper;
 
 import com.microservice.pagamento.dtos.PageableDTO;
 import com.microservice.pagamento.dtos.ProdutosDTO;
-import com.microservice.pagamento.entity.Produtos;
+import com.microservice.pagamento.entity.Pedido;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 public class ProdutosMapper {
 
-    public static ProdutosDTO toProdutoDTO( Produtos produtos ) {
+    public static ProdutosDTO toProdutoDTO( Pedido produtos ) {
         return ProdutosDTO.builder()
                 .id( produtos.getId() )
-                .nome( produtos.getNome() )
-                .estoque( produtos.getEstoque())
+                .status( produtos.getStatus() )
+                .totalAmount( produtos.getTotalAmount())
                 .build();
     }
 
-    public static Produtos toProdutoEntity( ProdutosDTO produtosDTO ) {
-        return Produtos.builder()
+    public static Pedido toProdutoEntity(ProdutosDTO produtosDTO ) {
+        return Pedido.builder()
                 .id( produtosDTO.getId() )
-                .nome( produtosDTO.getNome()     )
-                .estoque( produtosDTO.getEstoque() )
+                .status( produtosDTO.getStatus()     )
+                .totalAmount( produtosDTO.getTotalAmount() )
                 .build();
     }
 

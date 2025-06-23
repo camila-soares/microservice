@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8087
   servlet:
     context-path: /produtos
 
@@ -7,9 +7,9 @@ spring:
   application:
     name: produtos
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
       dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -18,12 +18,12 @@ spring:
     enable: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/produtos
+    url: jdbc:postgresql://localhost:5433/produtos
     username: postgres
     password: 123456
 
   rabbitmq:
-    host: localhost
+    host: 'localhost'
     port: 5672
     username: guest
     password: guest
@@ -36,11 +36,12 @@ produtos:
 security:
   jwt:
     token:
-      security-key: chave_microservico
+      security-key: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBmb3IgdGVzdA==
+      expire-length: 360000
 
 eureka:
   instance:
     hostname: localhost
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/registry/eureka/
+      defaultZone: http://localhost:8761/eureka/

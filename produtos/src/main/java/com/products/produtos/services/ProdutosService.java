@@ -6,7 +6,7 @@ import com.products.produtos.entity.Produtos;
 import com.products.produtos.filter.ProdutoFilter;
 import com.products.produtos.mapper.ProdutosMapper;
 import com.products.produtos.repositories.ProdutosRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,13 +18,14 @@ import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class ProdutosService {
 
-    @Autowired
-    private ProdutosRepository repository;
 
-    @Autowired
-    private ProdutosSendMessage produtosSendMessage;
+    private final ProdutosRepository repository;
+
+    private final ProdutosMapper mapper;
+    private final ProdutosSendMessage produtosSendMessage;
 
     public Produtos save(Produtos produtosDTO) {
         Produtos produtos;
@@ -37,12 +38,12 @@ public class ProdutosService {
     public Page< Produtos > findAllUser( String nome, Pageable pageable ) {
         Page < Produtos > produtos = Optional.of( repository.getAll( ProdutoFilter.of( ProdutosMapper.userDetailsDto( nome ) ), pageable ) )
                 .orElse( null );
-        return new PageImpl( produtos.map( f -> ProdutosMapper.toProdutoDTO( f ) ).getContent(),
+        return new PageImpl( produtos.map( f -> mapper.toProdutoDTO( f ) ).getContent(),
                 pageable, produtos.getTotalElements() );
     }
 
     private ProdutosDTO convertToProdutoDTO(Produtos produtos){
-        return ProdutosMapper.toProdutoDTO( produtos );
+        return mapper.toProdutoDTO( produtos );
     }
 
     public Produtos findProdutoById( Long id ) {
@@ -55,7 +56,7 @@ public class ProdutosService {
         repository.findById( id ).map( produto -> {
             produto.setNome( produtosDTO.getNome() );
             produto.setEstoque( produtosDTO.getEstoque() );
-            produto.setPreco( produtosDTO.getPreco() );
+            produto.setPrice( produtosDTO.getPreco() );
             return repository.save( produto );
         } ).orElseThrow( () -> new ResponseStatusException( HttpStatus.NO_CONTENT ) );
     }

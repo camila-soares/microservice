@@ -1,48 +1,47 @@
 package com.products.produtos.config;
 
-import com.products.produtos.jwt.JwtConfig;
-import com.products.produtos.jwt.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.products.produtos.security.JwtTokenFilter;
+import com.products.produtos.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
-public class SecurityConfig  extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
+public class SecurityConfig  {
 
 
     private final JwtTokenProvider provider;
-    @Autowired
-    public SecurityConfig( JwtTokenProvider provider ) {
-        this.provider = provider;
-    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder;
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public JwtTokenFilter jwtTokenFilter() {
+        return new JwtTokenFilter(provider);
     }
 
-    @Override
-    protected void configure( HttpSecurity http ) throws Exception {
-            http
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
-                .and()
-                    .authorizeRequests()
-                    .anyRequest().authenticated()
-                .and()
-                .apply( new JwtConfig( provider ) );
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http ) throws Exception {
+            http.csrf(AbstractHttpConfigurer::disable)
+                    .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+                    .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated()
+                    ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+            return http.build();
     }
 }

@@ -4,33 +4,31 @@ server:
 spring:
   application:
     name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      routes:
+        - id: produtos
+          uri: lb://produtos
+          predicates:
+            - Path=/produtos/**
+        - id: pagamento
+          uri: lb://pagamento
+          predicates:
+            - Path=/pagamento/**
+        - id: auth
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
+        - id: pedido
+          uri: lb://pedido/**
+          predicates:
+            - Path=/pedido/**
 
 eureka:
-  instance:
-    hostname: localhost
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/registry/eureka/
-
-zuul:
-  prefix: /api
-  ignored-services: "*"
-
-  routes:
-    produtos:
-      path: /produtos/**
-      service-id: produtos
-      strip-prefix: false
-      custom-sensitive-headers: true
-
-    pagamento:
-        path: /pagamento/**
-        service-id: pagamento
-        strip-prefix: false
-        custom-sensitive-headers: true
-
-    auth:
-      path: /auth/**
-      service-id: auth
-      strip-prefix: false
-      custom-sensitive-headers: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

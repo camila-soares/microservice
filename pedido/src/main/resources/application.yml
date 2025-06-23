@@ -1,0 +1,153 @@
+server:
+  port: 8094
+  servlet:
+    context-path: /pedido
+
+logging:
+  level:
+    org.springframework.cloud.stream.binder.rabbit: DEBUG
+
+spring:
+  cloud:
+    function:
+      definition: pedidoQualificado;pedidoReservado;pedidoRecusado;pagamentoAutorizado;pagamentoNegado;pedidoEnviado;pedidoEntregue
+    stream:
+      bindings:
+        pedidoQualificado-in-0:
+          destination: pedido-qualificado
+          group: pedido
+        pedidoReservado-in-0:
+          destination: pedido-reservado
+          group: pedido
+        pedidoRecusado-in-0:
+          destination: pedido-recusado
+          group: pedido
+        pagamentoAutorizado-in-0:
+          destination: pagamento-autorizado
+          group: pedido
+        pagamentoNegado-in-0:
+          destination: pagamento-negado
+          group: pedido
+        pedidoEnviado-in-0:
+          destination: pedido-enviado
+          group: pedido
+        pedidoEntregue-in-0:
+          destination: pedido-entregue
+          group: pedido
+
+        pedidoCriado-out-0:
+          destination: pedido-criado
+        pedidoConfirmado-out-0:
+          destination: pedido-confirmado
+      rabbit:
+        bindings:
+          # CONSUMER
+          pedidoQualificado-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: pedido-processing-error
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+          pedidoReservado-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: pedido-processing-error
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+          pedidoRecusado-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: pedido-processing-error
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+          pagamentoAutorizado-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: pedido-processing-error
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+          pagamentoNegado-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: pedido-processing-error
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+          pedidoEnviado-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: pedido-processing-error
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+          pedidoEntregue-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: pedido-processing-error
+              republishToDlq: true
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+
+          # PRODUCER
+          pedidoCriado-out-0:
+            producer:
+              exchangeType: fanout
+          pedidoConfirmado-out-0:
+            producer:
+              exchangeType: fanout
+      binders:
+        rabbitmq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: ${RABBIT_HOST:localhost}
+                port: ${RABBIT_PORT:5672}
+                username: ${RABBIT_USERNAME:guest}
+                password: ${RABBIT_PASSWORD:guest}
+                virtual-host: /
+
+  application:
+    name: pedido
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/pedido
+    username: postgres
+    password: 123456
+
+
+pedido:
+  rabbitmq:
+    exchange: produtos.exchange
+    queue: produto.queue
+
+security:
+  jwt:
+    token:
+      security-key: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBmb3IgdGVzdA==
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

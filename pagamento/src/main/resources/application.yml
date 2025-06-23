@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8089
   servlet:
     context-path: /pagamento
 
@@ -9,7 +9,7 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
       dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -18,7 +18,7 @@ spring:
     enable: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/pagamento
+    url: jdbc:postgresql://localhost:5433/pagamento
     username: postgres
     password: 123456
 
@@ -31,17 +31,17 @@ spring:
 
 pagamento:
   rabbitmq:
-    exchange: produtos.exchange
-    queue: produto.queue
+    exchange: pedido.exchange
+    queue: pedido.queue
 
 security:
   jwt:
     token:
-      security-key: chave_microservico
+      security-key: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBmb3IgdGVzdA==
 
 eureka:
   instance:
     hostname: localhost
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/registry/eureka/
+      defaultZone: http://localhost:8761/eureka/

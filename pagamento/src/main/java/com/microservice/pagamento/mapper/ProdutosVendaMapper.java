@@ -26,7 +26,7 @@ public class ProdutosVendaMapper {
 
     public static ProdutoVenda toProdutoEntity( ProdutosVendaDTO produtosVendaDTO ) {
         return ProdutoVenda.builder()
-                .id( produtosVendaDTO.getId() )
+                //.id( produtosVendaDTO.getId() )
                 .idProduto( produtosVendaDTO.getIdProduto() )
                 .quantidade( produtosVendaDTO.getQuantidade() )
                 .build();
