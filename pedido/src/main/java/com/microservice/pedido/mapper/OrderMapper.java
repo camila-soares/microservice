@@ -1,8 +1,9 @@
 package com.microservice.pedido.mapper;
 
-import com.microservice.pedido.dto.OrderCreationDTO;
-import com.microservice.pedido.dto.OrderDTO;
-import com.microservice.pedido.dto.PaymentDTO;
+import com.microservice.commons.dtos.OrderCreationDTO;
+import com.microservice.commons.dtos.OrderDTO;
+
+import com.microservice.commons.dtos.PaymentDTO;
 import com.microservice.pedido.model.Order;
 import com.microservice.pedido.model.Payment;
 import org.mapstruct.Mapper;
@@ -14,9 +15,9 @@ public interface OrderMapper {
     OrderDTO toDTO(Order order);
 
     @Mappings({
-            @Mapping(source = "items", target = "items"),
-            @Mapping(source = "customer", target = "customer"),
-            @Mapping(source = "payment", target = "payment")
+            //@Mapping(source = "items", target = "items"),
+            //@Mapping(source = "customer", target = "customer")
+            //@Mapping(source = "payment", target = "payment")
     })
     Order toEntity(OrderCreationDTO dto);
 

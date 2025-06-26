@@ -1,7 +1,7 @@
 package com.microservice.pagamento.services;
 
+import com.microservice.commons.dtos.VendaDTO;
 import com.microservice.pagamento.config.PedidosListnerMessage;
-import com.microservice.pagamento.dtos.VendaDTO;
 import com.microservice.pagamento.entity.ProdutoVenda;
 import com.microservice.pagamento.entity.Venda;
 import com.microservice.pagamento.exception.ResourceNotFoundException;
@@ -34,7 +34,7 @@ public class VendaService {
     PedidosListnerMessage listnerMessage;
 
     @Transactional
-    public VendaDTO save( VendaDTO vendaDTO) {
+    public VendaDTO save(VendaDTO vendaDTO) {
 
         Venda venda = vendaRepository.save(VendaMapper.createEntity(vendaDTO));
 

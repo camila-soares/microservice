@@ -1,7 +1,7 @@
 package com.products.produtos.services;
 
+import com.microservice.commons.dtos.ProdutosDTO;
 import com.products.produtos.config.ProdutosSendMessage;
-import com.products.produtos.dtos.ProdutosDTO;
 import com.products.produtos.entity.Produtos;
 import com.products.produtos.filter.ProdutoFilter;
 import com.products.produtos.mapper.ProdutosMapper;
@@ -54,7 +54,7 @@ public class ProdutosService {
     public void updateProduto( Long id, ProdutosDTO produtosDTO ) {
 
         repository.findById( id ).map( produto -> {
-            produto.setNome( produtosDTO.getNome() );
+            produto.setNome( produtosDTO.getName() );
             produto.setEstoque( produtosDTO.getEstoque() );
             produto.setPrice( produtosDTO.getPreco() );
             return repository.save( produto );

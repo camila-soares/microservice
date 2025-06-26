@@ -24,9 +24,17 @@ spring:
           predicates:
             - Path=/auth/**
         - id: pedido
-          uri: lb://pedido/**
+          uri: lb://pedido
           predicates:
             - Path=/pedido/**
+        - id: qualificacao
+          uri: lb://qualificacao
+          predicates:
+            - Path=/qualificacao/**
+        - id: invetory
+          uri: lb://invetory
+          predicates:
+            - Path=/invetory/**
 
 eureka:
   client:

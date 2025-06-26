@@ -1,6 +1,6 @@
 package com.products.produtos.filter;
 
-import com.products.produtos.dtos.ProdutosDTO;
+import com.microservice.commons.dtos.ProdutosDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class ProdutoFilter {
 
     public static ProdutoFilter of( ProdutosDTO produtosDTO ) {
         return ProdutoFilter.builder()
-                .nome( produtosDTO.getNome() )
+                .nome( produtosDTO.getName() )
                 .build();
     }
 }

@@ -1,7 +1,6 @@
 package com.microservice.pedido.model;
 
 
-import com.microservice.pedido.dto.Address;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;

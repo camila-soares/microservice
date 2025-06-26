@@ -7,51 +7,31 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 
 @Service
+@RequiredArgsConstructor
 public class JwtTokenProvider {
+    private final UserDetailsService userDetailsService;
 
     private static final String SECRET = "eHk10qTbSU9zJY7lCi+sIOL5BJVwN/JRSQByqvgb2ibOVwSINnCBiKXMYx/Zj2xhsbm+QULnUUtvATDjzC1Oag==";
     String secret = Base64.getEncoder().encodeToString(SECRET.getBytes());
 
-    public Authentication getAuth(String token ) {
-        UserDetails userDetails = new UserDetails() {
 
-
-            public boolean isEnabled() {
-                return true;
-            }
-            public boolean isCredentialsNonExpired() {
-                return true;
-            }
-            public boolean isAccountNonLocked() {
-                return true;
-            }
-            public boolean isAccountNonExpired() {
-                return true;
-            }
-            public String getUsername() {
-                return "";
-            }
-            public String getPassword() {
-                return "";
-            }
-            public Collection< ? extends GrantedAuthority > getAuthorities() {
-                return null;
-            }
-        };
-        return new UsernamePasswordAuthenticationToken( userDetails, "", userDetails.getAuthorities() );
-    }
 
     public String resolveToken( HttpServletRequest request ) {
         String bearerToken = request.getHeader( "Authorization" );
@@ -66,11 +46,26 @@ public class JwtTokenProvider {
             Jws<Claims> claimsJwts = Jwts
                     .parserBuilder()
                     .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
-                    .build().parseClaimsJws(token);
+                    .build()
+                    .parseClaimsJws(token);
 
-            return claimsJwts.getBody().getExpiration().after(new Date());
+            return !claimsJwts.getBody().getExpiration().before(new Date());
         }catch( JwtException | IllegalArgumentException exception ) {
             return false;
         }
     }
+
+    public String extractLoginUser(String token) {
+        Claims claims = extractClaims(token);
+        return claims.getSubject();
+    }
+
+    public Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }

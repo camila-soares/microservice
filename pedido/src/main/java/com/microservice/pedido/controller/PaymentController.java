@@ -1,8 +1,8 @@
 package com.microservice.pedido.controller;
 
 
-import com.microservice.pedido.dto.OrderCreationDTO;
-import com.microservice.pedido.dto.OrderDTO;
+import com.microservice.commons.dtos.OrderCreationDTO;
+import com.microservice.commons.dtos.OrderDTO;
 import com.microservice.pedido.mapper.OrderMapper;
 import com.microservice.pedido.model.Order;
 import com.microservice.pedido.service.OderService;
@@ -21,9 +21,9 @@ public class PaymentController {
     private final OrderMapper orderMapper;
 
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderCreationDTO order) {
-        Order order1 = oderService.create(orderMapper.toEntity(order));
-        return ResponseEntity.accepted().body(orderMapper.toDTO(order1));
+    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+        Order order1 = oderService.create(order);
+        return ResponseEntity.accepted().body(order1);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

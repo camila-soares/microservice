@@ -1,23 +1,21 @@
 package com.microservice.pagamento.config;
 
-import com.microservice.pagamento.dtos.ProdutosDTO;
-import com.microservice.pagamento.entity.Produtos;
-import com.microservice.pagamento.mapper.ProdutosMapper;
-import com.microservice.pagamento.repositories.ProdutosRepository;
+import com.microservice.pagamento.entity.Pedido;
+import com.microservice.pagamento.repositories.PedidoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ProdutosListnerMessage {
 
-    @Autowired
-    private ProdutosRepository produtosRepository;
+   private final PedidoRepository pedidoRepository;
 
     @RabbitListener(queues = {"${pagamento.rabbitmq.queue}"})
-    public void listiner( @Payload Produtos produtos ) {
-        System.out.println("RECEBENDO O PRODUTO " + produtos);
-        produtosRepository.save(produtos);
+    public void listiner( @Payload Pedido pedido ) {
+        System.out.println("RECEBENDO O PEDIDO " + pedido);
+        pedidoRepository.save(pedido);
     }
 }

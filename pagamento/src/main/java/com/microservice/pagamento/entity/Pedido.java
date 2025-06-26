@@ -1,9 +1,7 @@
 package com.microservice.pagamento.entity;
 
-import com.microservice.pagamento.dtos.Customer;
-import com.microservice.pagamento.dtos.Item;
-import com.microservice.pagamento.dtos.Payment;
-import com.microservice.pagamento.dtos.enums.OrderStatus;
+import com.microservice.commons.enums.OrderStatus;
+
 import jakarta.persistence.*;
 import lombok.*;
 

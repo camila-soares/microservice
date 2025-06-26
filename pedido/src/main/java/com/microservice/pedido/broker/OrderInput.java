@@ -1,14 +1,13 @@
 package com.microservice.pedido.broker;
 
 
-import com.microservice.pedido.dto.OrderDTO;
-import com.microservice.pedido.dto.OrderDeliveryDto;
+import com.microservice.commons.dtos.OrderDTO;
+import com.microservice.commons.dtos.OrderDeliveryDto;
 import com.microservice.pedido.mapper.OrderMapper;
 import com.microservice.pedido.model.Order;
 import com.microservice.pedido.service.OderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ public class OrderInput {
 
     @Bean
     public Consumer<OrderDTO> pedidoQualificado() {
-        return order -> service.processarQualificacaoDePedido(order.getId());
+       return order -> service.processarQualificacaoDePedido(order.getId());
     }
 
     @Bean

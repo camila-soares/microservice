@@ -2,7 +2,6 @@ package com.microservice.authentication.config;
 
 import com.microservice.authentication.security.JwtTokenFilter;
 import com.microservice.authentication.security.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -48,7 +47,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
 
                 ) .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterAfter(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
     }

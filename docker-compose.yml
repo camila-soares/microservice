@@ -1,0 +1,47 @@
+version: "3.3"  # optional since v1.27.0
+services:
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ecommerce
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - ecommerce
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.10.23-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - ecommerce
+
+  mockoon:
+    image: mockoon/cli
+    command: [ "--data", "data", "--port", "3000" ]
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./mockoon.json:/data
+    networks:
+      - ecommerce
+      -
+  postgres:
+      container_name: postgres
+      image: postgres
+      ports:
+        - "5433:5433"
+      environment:
+        MONGO_INITDB_DATABASE: ecommerce
+        MONGO_INITDB_ROOT_USERNAME: postgres
+        MONGO_INITDB_ROOT_PASSWORD: 123456
+      networks:
+        - ecommerce

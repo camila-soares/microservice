@@ -1,8 +1,7 @@
 package com.microservice.pedido.model;
 
 
-import com.microservice.pedido.dto.Item;
-import com.microservice.pedido.dto.enums.OrderStatus;
+import com.microservice.commons.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,10 +25,12 @@ public class Order {
 
     private Double totalAmount;
 
+    @Column(name = "status", length = 255)
+    @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.received;
 
     @CollectionTable(name = "order_items", joinColumns = @JoinColumn(name = "order_id"))
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Item> items = new ArrayList<>();
 
     @Embedded

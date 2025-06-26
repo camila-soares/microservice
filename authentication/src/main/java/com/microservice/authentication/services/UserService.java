@@ -1,10 +1,10 @@
 package com.microservice.authentication.services;
 
-import com.microservice.authentication.dtos.UserDTO;
 import com.microservice.authentication.entity.User;
-import com.microservice.authentication.mapper.UserMapper;
 import com.microservice.authentication.repositories.UserRepository;
-import com.microservice.authentication.security.JwtTokenProvider;
+import com.microservice.commons.dtos.LoginDTO;
+import com.microservice.commons.dtos.UserDTO;
+import com.microservice.commons.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,34 +19,45 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
-    public User authenticate(UserDTO userDTO) {
+    public User authenticate(LoginDTO loginDTO) {
 
-        User user = userRepository.findByUsername(userDTO.getUsername());
-        if (user == null) {
-            throw new RuntimeException("User not found for email: " + userDTO.getUsername());
-        }
+        User user = userRepository.findByEmail(loginDTO.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        boolean passwordMatch = passwordEncoder.matches(userDTO.getPassword(), user.getPassword());
+        boolean passwordMatch = passwordEncoder.matches(loginDTO.getPassword(), user.getPassword());
         if (!passwordMatch) {
             throw new RuntimeException("Invalid password");
         }
         return user;
     }
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = userRepository.findByUsername(username);
-        if (user != null) {
-            return user;
-        } else {
-            throw new UsernameNotFoundException("Usuário" + username + " não encontrado!");
-        }
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found for email: " + email));
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities(user.getUserRole().toString())
+                .build();
     }
 
     public User saveUser(UserDTO userDTO) {
-        User user;
-        user = userRepository.save(userMapper.toUser(userDTO));
+
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+        User user = User.builder()
+                .firstName(userDTO.getFirstName())
+                .lastName(userDTO.getLastName())
+                .email(userDTO.getEmail())
+                .userRole(UserRole.CLIENTE)
+                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .build();
+        userRepository.save(user);
+
         return user;
+
     }
 }

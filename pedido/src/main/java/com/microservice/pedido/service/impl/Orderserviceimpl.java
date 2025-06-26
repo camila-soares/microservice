@@ -1,8 +1,8 @@
 package com.microservice.pedido.service.impl;
 
+import com.microservice.commons.enums.OrderStatus;
 import com.microservice.pedido.broker.OrderOutput;
-import com.microservice.pedido.dto.Item;
-import com.microservice.pedido.dto.enums.OrderStatus;
+import com.microservice.pedido.model.Item;
 import com.microservice.pedido.model.Order;
 import com.microservice.pedido.model.Payment;
 import com.microservice.pedido.repository.OderRepository;
@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,9 @@ public class Orderserviceimpl implements OderService {
 
     @Override
     public void processarReservaDePedido(String orderId) {
-        Order order = oderRepository.reserve(orderId);
+        oderRepository.reserve(orderId);
+       Order order = oderRepository.findById(orderId).orElseThrow(() ->
+               new RuntimeException("Order not found"));
         log.info("[{}] Pedido Reservado", orderId);
         if (order.isQualified())
             confirmar(orderId);
@@ -53,50 +56,59 @@ public class Orderserviceimpl implements OderService {
 
     @Override
     public void processarQualificacaoDePedido(String orderId) {
-        Order order = oderRepository.qualify(orderId);
-
+        int order = oderRepository.qualify(orderId);
+        Order order1 = oderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found"));
         log.info("[{}] Pedido Reservado", orderId);
-        if (order.isQualified())
+        if (order1.isQualified())
             confirmar(orderId);
     }
 
 
     @Override
     public void processarRecusaDePedido(String orderId) {
-        oderRepository.updateByStatus(OrderStatus.cancelled, orderId);
+        LocalDateTime updateAt = LocalDateTime.now();
+        oderRepository.updateByStatus(OrderStatus.cancelled, orderId, updateAt);
         log.info("[{}] Pedido Recusado", orderId);
     }
 
     @Override
     public void processarPagamentoAutorizado(String orderId, Payment payment) {
+        LocalDateTime updateAt = LocalDateTime.now();
         oderRepository.updatePagameto(orderId, payment);
-        oderRepository.updateByStatus(OrderStatus.in_preparation, orderId);
+        oderRepository.updateByStatus(OrderStatus.in_preparation, orderId, updateAt);
 
         log.info("[{}] Pagamento Autorizado :(", orderId);
     }
 
     @Override
     public void processarPagamentoNaoAutorizado(String orderId, Payment payment) {
+        LocalDateTime updateAt = LocalDateTime.now();
         oderRepository.updatePagameto(orderId, payment);
-        oderRepository.updateByStatus(OrderStatus.cancelled, orderId);
+        oderRepository.updateByStatus(OrderStatus.cancelled, orderId, updateAt);
 
         log.info("[{}] Pagamento Não Autorizado :(", orderId);
     }
 
     @Override
     public void processarEnvioDePedido(String orderId) {
-        oderRepository.updateByStatus(OrderStatus.sent, orderId);
+        LocalDateTime updateAt = LocalDateTime.now();
+        oderRepository.updateByStatus(OrderStatus.sent, orderId, updateAt);
         log.info("[{}] Pedido Enviado", orderId);
     }
 
     @Override
     public void processarEntregaDePedido(String orderId) {
-        oderRepository.updateByStatus(OrderStatus.delivered, orderId);
+        LocalDateTime updateAt = LocalDateTime.now();
+        oderRepository.updateByStatus(OrderStatus.delivered, orderId, updateAt);
         log.info("[{}] Pedido Entregue :)", orderId);
     }
 
     private void confirmar(String orderId) {
-        Order order = oderRepository.updateByStatus(OrderStatus.confirmed, orderId);
+        LocalDateTime updateAt = LocalDateTime.now();
+        oderRepository.updateByStatus(OrderStatus.confirmed, orderId, updateAt);
+        Order order =  oderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found"));
         orderOutput.pedidoConfirmado(order);
         log.info("[{}] Pedido Confirmado", orderId);
     }
