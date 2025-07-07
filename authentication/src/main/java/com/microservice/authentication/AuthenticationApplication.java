@@ -1,16 +1,8 @@
 package com.microservice.authentication;
 
-import com.microservice.authentication.entity.User;
-import com.microservice.authentication.repositories.UserRepository;
-import com.microservice.commons.enums.UserRole;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.util.Optional;
 
 @SpringBootApplication
 @EnableDiscoveryClient

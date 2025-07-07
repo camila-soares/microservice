@@ -7,6 +7,12 @@ spring:
   application:
     name: produtos
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+         secret: eHk10qTbSU9zJY7lCi+sIOL5BJVwN/JRSQByqvgb2ibOVwSINnCBiKXMYx/Zj2xhsbm+QULnUUtvATDjzC1Oag==
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5433/produtos
@@ -22,19 +28,61 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USERNAME:guest}
+    password: ${RABBIT_PASSWORD:guest}
 
-produtos:
-  rabbitmq:
-    exchange: produtos.exchange
-    routingkey: produtos.routingkey
+    # https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream-binder-rabbit.html#_rabbitmq_consumer_properties
+  cloud:
+    function:
+      definition: pedidoCriado;
+    stream:
+      bindings:
+        pedidoCriado-in-0:
+          destination: pedido-criado
+          group: inventory-ms
+
+        pedidoReservado-out-0:
+          destination: pedido-reservado
+        pedidoRecusado-out-0:
+            destination: pedido-recusado
+      rabbit:
+         bindings:
+          # CONSUMER
+          pedidoCriado-in-0:
+            consumer:
+              exchangeType: fanout
+              autoBindDlq: true
+              deadLetterExchange: inventory-processing-error
+              deadLetterExchangeType: fanout
+              dlqMaxLength: 100
+              dlqTtl: 120000
+
+          # PRODUCER
+          pedidoReservado-out-0:
+            producer:
+              exchangeType: fanout
+          pedidoRecusado-out-0:
+            producer:
+              exchangeType: fanout
+      binders:
+        rabbitmq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: ${RABBIT_HOST:localhost}
+                port: ${RABBIT_PORT:5672}
+                username: ${RABBIT_USERNAME:guest}
+                password: ${RABBIT_PASSWORD:guest}
+                virtual-host: /
 
 eureka:
   instance:
     hostname: localhost
   client:
-    service-url:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
       defaultZone: http://localhost:8761/eureka/

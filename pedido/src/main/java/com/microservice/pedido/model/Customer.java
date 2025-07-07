@@ -5,20 +5,25 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.UUID;
+
 
 @Jacksonized
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
-@ToString
 @Embeddable
-@EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 public class Customer {
 
-    private String firstName, lastName, email;
 
-    @Embedded
-    private Address deliveryAddress;
+
+
+    private String idCustomer;
+    private String name, email, birthdate;
+
+    private Address address;//,DeliveryAddress, Billing;
+
+
 }

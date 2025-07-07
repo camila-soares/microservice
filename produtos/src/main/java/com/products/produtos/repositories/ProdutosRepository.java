@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Repository
-public interface ProdutosRepository extends JpaRepository< Produtos, Long >, JpaSpecificationExecutor< Produtos > {
+public interface ProdutosRepository extends JpaRepository< Produtos, String >, JpaSpecificationExecutor< Produtos > {
 
     default Page< Produtos > getAll( ProdutoFilter filter, Pageable pageable ) {
         Specification spec = where( ProdutosSpecification.nome( filter.getNome() ) );

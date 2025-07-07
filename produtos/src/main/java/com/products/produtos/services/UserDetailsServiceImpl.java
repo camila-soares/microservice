@@ -4,7 +4,6 @@ package com.products.produtos.services;
 import com.microservice.authentication.entity.User;
 import com.microservice.authentication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

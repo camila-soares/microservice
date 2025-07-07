@@ -8,6 +8,11 @@ logging:
     org.springframework.cloud.stream.binder.rabbit: DEBUG
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: eHk10qTbSU9zJY7lCi+sIOL5BJVwN/JRSQByqvgb2ibOVwSINnCBiKXMYx/Zj2xhsbm+QULnUUtvATDjzC1Oag==
   cloud:
     function:
       definition: pedidoQualificado;pedidoReservado;pedidoRecusado;pagamentoAutorizado;pagamentoNegado;pedidoEnviado;pedidoEntregue
@@ -36,6 +41,7 @@ spring:
           group: pedido
 
         pedidoCriado-out-0:
+          content-type: application/json
           destination: pedido-criado
         pedidoConfirmado-out-0:
           destination: pedido-confirmado
@@ -128,19 +134,12 @@ spring:
     password: 123456
 
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-
-
-pedido:
-  rabbitmq:
-    exchange: produtos.exchange
-    queue: produto.queue
 
 
 eureka:

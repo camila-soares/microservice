@@ -1,9 +1,11 @@
 package com.products.produtos.entity;
 
+import com.products.produtos.exception.UnavailableItemsException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.servlet.UnavailableException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,4 +34,11 @@ public class Produtos implements Serializable {
 
     @Column(name = "preco", nullable = false)
     private Double price;
+
+    public void sell(int items) {
+       this.estoque = this.estoque - items;
+        if (this.estoque < 0) {
+            throw new UnavailableItemsException();
+        }
+    }
 }

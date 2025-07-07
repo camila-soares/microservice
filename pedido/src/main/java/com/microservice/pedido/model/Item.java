@@ -8,14 +8,13 @@ import lombok.extern.jackson.Jacksonized;
 
 
 @Jacksonized
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Embeddable
 @NoArgsConstructor
+@Embeddable
 public class Item {
 
     private String productId;

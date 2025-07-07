@@ -4,13 +4,26 @@ server:
 spring:
   application:
     name: gateway
+  security:
+    oauth2:
+     resourceserver:
+       jwt:
+         secret: eHk10qTbSU9zJY7lCi+sIOL5BJVwN/JRSQByqvgb2ibOVwSINnCBiKXMYx/Zj2xhsbm+QULnUUtvATDjzC1Oag==
+         validity: 3600000
+
   cloud:
+    discovery:
+      enabled: true
     gateway:
       discovery:
         locator:
           enabled: true
           lowerCaseServiceId: true
       routes:
+        - id: auth
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
         - id: produtos
           uri: lb://produtos
           predicates:
@@ -19,10 +32,6 @@ spring:
           uri: lb://pagamento
           predicates:
             - Path=/pagamento/**
-        - id: auth
-          uri: lb://auth
-          predicates:
-            - Path=/auth/**
         - id: pedido
           uri: lb://pedido
           predicates:
@@ -31,10 +40,10 @@ spring:
           uri: lb://qualificacao
           predicates:
             - Path=/qualificacao/**
-        - id: invetory
-          uri: lb://invetory
+        - id: fulfillments
+          uri: lb://fulfillments
           predicates:
-            - Path=/invetory/**
+            - Path=/fulfillments/**
 
 eureka:
   client:

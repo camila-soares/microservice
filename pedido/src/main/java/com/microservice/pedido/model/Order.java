@@ -15,6 +15,7 @@ import java.util.UUID;
 @Table(name = "pedido")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {
@@ -23,20 +24,16 @@ public class Order {
     @Id
     private String id = UUID.randomUUID().toString();
 
-    private Double totalAmount;
-
     @Column(name = "status", length = 255)
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.received;
 
-    @CollectionTable(name = "order_items", joinColumns = @JoinColumn(name = "order_id"))
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Item> items = new ArrayList<>();
+   @CollectionTable(name = "order_items", joinColumns = @JoinColumn(name = "order_id"))
+   @ElementCollection(fetch = FetchType.EAGER)
+   private List<Item> items = new ArrayList<>();
 
-    @Embedded
     private Customer customer;
 
-    @Embedded
     private Payment payment;
 
     private boolean qualified;
@@ -49,8 +46,10 @@ public class Order {
     private LocalDateTime updatedAt;
 
     public void calcularValorTotal() {
-        totalAmount = items.stream()
-                .mapToDouble(v -> v.getPrice() * v.getCount()).sum();
-
+        payment.setAmount(items.stream()
+                .mapToDouble(v -> v.getPrice() * v.getCount()).sum());
     }
+
+    private String merchantOrderId;
+
 }

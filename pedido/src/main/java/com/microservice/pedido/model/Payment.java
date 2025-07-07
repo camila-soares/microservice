@@ -1,6 +1,5 @@
 package com.microservice.pedido.model;
 
-import com.microservice.commons.enums.Brand;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
@@ -11,13 +10,22 @@ import lombok.extern.jackson.Jacksonized;
 @Setter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Embeddable
+@AllArgsConstructor
 public class Payment {
 
 
-    private String cardId, bin, numberToken, cardholderName, securityCode, expirationMonth, expirationYear;
+    private String type;
+    private AirlineData airlineData;
+    private CreditCard creditCard;
+    private String currency, interest;
+    private int serviceTaxAmount, installments;
+    private Boolean capture, authenticate,
+            recurrent;
+    private String softDescriptor;
+    private Boolean tip, isCryptoCurrencyNegotiation;
+    private Double amount;
 
-    private Brand brand;
+
 
 }

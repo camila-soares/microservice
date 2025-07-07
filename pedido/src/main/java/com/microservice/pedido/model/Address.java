@@ -1,20 +1,34 @@
 package com.microservice.pedido.model;
 
+import com.microservice.commons.dtos.AddressDto;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
-@Jacksonized
-@Getter
-@Setter
+@Embeddable
+@Data
+@NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode
-@Embeddable
-@NoArgsConstructor
 public class Address {
 
+    private String street, number, complement, zipCode, city, state, country, neighborhood;
 
-    private String street, number, postalCode, city, state;
+
+
+//    public AddressDto addressDto(Address address) {
+//        return new AddressDto(address.street,
+//                address.number, address.complement
+//        ,address.zipCode, address.city, address.state, address.country, address.neighborhood);
+//
+//    }
+
+//    public Address dtoToAddress(AddressDto address) {
+//        return new Address(address.getStreet(),
+//                address.getNumber(), address.getComplement()
+//                ,address.getZipCode(), address.getCity(),
+//                address.getState(), address.getCountry(), address.getNeighborhood());
+//
+//    }
 }

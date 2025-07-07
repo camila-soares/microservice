@@ -6,16 +6,15 @@ import com.microservice.authentication.security.JwtTokenProvider;
 import com.microservice.authentication.services.UserService;
 import com.microservice.commons.dtos.LoginDTO;
 import com.microservice.commons.dtos.UserDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -36,6 +35,7 @@ public class AuthController {
 
             if (user != null) {
               token =  jwtTokenProvider.createToken(user);
+              jwtTokenProvider.validateToken(token);
             }
 
             Map<Object, Object> model = new HashMap<>();
@@ -51,13 +51,21 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UserDTO> createUser(@Validated @RequestBody UserDTO dto) throws Exception {
         User user = service.saveUser(dto);
-        System.out.printf("User saved: %s%n", user.toString());
-        UserDTO userDTO = UserDTO.builder().id(user.getId())
+         UserDTO userDTO = UserDTO.builder().id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .build();
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
 
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
+    public ResponseEntity<Void> updateUser(
+            @PathVariable Long id,
+                                              @Valid @RequestBody UserDTO dto) throws Exception {
+        service.updateUser(id, dto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

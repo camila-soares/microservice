@@ -3,31 +3,37 @@ package com.microservice.commons.dtos;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.jackson.Jacksonized;
+
+import java.util.UUID;
+
 
 @Jacksonized
 @Builder
-@Getter
+@Data
 @ToString
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomerDTO {
 
-    @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
-    @NotNull
-    private String id;
+    private String idCustomer = UUID.randomUUID().toString();
 
-    private String firstName;
-
-    private String lastName;
+    private String name;
 
     @Email
     @NotNull
     private String email;
 
+    private String birthdate;
+
     @NotNull
-    private AddressDto deliveryAddress;
+    private AddressDto address;
+
+
+
+//    private AddressDto DeliveryAddress;
+//    private AddressDto Billing;
+
 }

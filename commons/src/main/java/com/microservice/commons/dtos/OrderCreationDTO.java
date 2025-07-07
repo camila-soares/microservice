@@ -6,11 +6,13 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Jacksonized
-@Data
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -22,8 +24,12 @@ public class OrderCreationDTO {
     private List<@Valid ItemDto> items = new ArrayList<>();
 
     @NotNull
-    private CustomerDTO customer;
+    private CustomerDTO Customer;
 
     @NotNull
-    private PaymentDTO payment;
+    private PaymentDTO Payment;
+
+    private String MerchantOrderId;
+
+
 }

@@ -17,7 +17,6 @@ public class OrderOutput {
 
     private final ObjectMapper objectMapper;
 
-    private final OrderMapper orderMapper;
 
     public void pedidoCriado(Order order) {
         enviarMensagem("pedidoCriado-out-0", order);
@@ -29,7 +28,7 @@ public class OrderOutput {
 
     private void enviarMensagem(String bindingName, Order order) {
         try {
-            streamBridge.send(bindingName, objectMapper.writeValueAsBytes(orderMapper.toDTO(order)));
+            streamBridge.send(bindingName, objectMapper.writeValueAsBytes(OrderMapper.orderToOrderDTO(order)));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

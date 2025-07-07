@@ -11,10 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/produtos")
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class ProdutosController {
 
@@ -24,8 +27,8 @@ public class ProdutosController {
     private final ProdutosMapper mapper;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Produtos> saveProdutos( @RequestBody Produtos produtosDTO ) {
+    public ResponseEntity<Produtos> saveProdutos(@AuthenticationPrincipal Jwt jwt, @RequestBody Produtos produtosDTO ) {
+        String username = jwt.getSubject();
         final Produtos produtos = service.save( produtosDTO );
         return new ResponseEntity( mapper.toProdutoDTO( produtos ), HttpStatus.CREATED );
 
@@ -41,7 +44,7 @@ public class ProdutosController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity< ProdutosDTO > findProdutoById( @PathVariable Long id ) {
+    public ResponseEntity< ProdutosDTO > findProdutoById( @PathVariable String id ) {
         Produtos produtos = service.findProdutoById( id );
         ProdutosDTO produtosDTO = mapper.toProdutoDTO( produtos );
         return new ResponseEntity<>( produtosDTO, HttpStatus.OK);
@@ -49,13 +52,13 @@ public class ProdutosController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteClient ( @PathVariable Long id) {
+    public void deleteClient ( @PathVariable String id) {
         service.deleteProduto( id );
     }
 
 
     @PutMapping("/{id}")
-    public void updateCliente( @PathVariable Long id, @RequestBody ProdutosDTO produtosDTO ) {
+    public void updateCliente( @PathVariable String id, @RequestBody ProdutosDTO produtosDTO ) {
         service.updateProduto( id, produtosDTO );
 
     }

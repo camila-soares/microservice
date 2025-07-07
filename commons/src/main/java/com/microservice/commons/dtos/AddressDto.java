@@ -2,16 +2,14 @@ package com.microservice.commons.dtos;
 
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 
 @Jacksonized
 @Builder
-@Getter
+@Data
 @ToString
+@AllArgsConstructor
 @EqualsAndHashCode
 public class AddressDto {
 
@@ -22,11 +20,17 @@ public class AddressDto {
     private String number;
 
     @NotBlank
-    private String postalCode;
+    private String complement;
+
+    @NotBlank
+    private String zipCode;
 
     @NotBlank
     private String city;
 
-    @NotBlank
     private String state;
+    private String country;
+    private String neighborhood;
+
+
 }

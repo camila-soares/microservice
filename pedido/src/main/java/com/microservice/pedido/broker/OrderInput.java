@@ -4,7 +4,6 @@ package com.microservice.pedido.broker;
 import com.microservice.commons.dtos.OrderDTO;
 import com.microservice.commons.dtos.OrderDeliveryDto;
 import com.microservice.pedido.mapper.OrderMapper;
-import com.microservice.pedido.model.Order;
 import com.microservice.pedido.service.OderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,6 @@ import java.util.function.Consumer;
 public class OrderInput {
 
    private final OderService service;
-   private final OrderMapper orderMapper;
 
     @Bean
     public Consumer<OrderDTO> pedidoQualificado() {
@@ -37,17 +35,17 @@ public class OrderInput {
 
     @Bean
     public Consumer<OrderDTO> pagamentoAutorizado() {
-        return order -> service.processarPagamentoAutorizado(order.getId(), orderMapper.toPayment(order.getPayment()));
+        return order -> service.processarPagamentoAutorizado(order.getId(), OrderMapper.toPayment(order.getPayment()));
     }
 
     @Bean
     public Consumer<OrderDTO> pagamentoNegado() {
-        return order -> service.processarPagamentoNaoAutorizado(order.getId(), orderMapper.toPayment(order.getPayment()));
+        return order -> service.processarPagamentoNaoAutorizado(order.getId(), OrderMapper.toPayment(order.getPayment()));
     }
 
 
     @Bean
-    public Consumer<Order> pedidoEnviado() {
+    public Consumer<OrderDTO> pedidoEnviado() {
         return order -> service.processarEnvioDePedido(order.getId());
     }
 

@@ -1,23 +1,20 @@
 package com.microservice.commons.dtos;
 
 
-import com.microservice.commons.enums.OrderStatus;
 import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+@Jacksonized
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class OrderDTO {
 
     private String id;
-
-    private Double totalAmount;
-
-    private OrderStatus status;
 
     @Singular
     private List<ItemDto> items;
@@ -25,6 +22,7 @@ public class OrderDTO {
     private CustomerDTO customer;
 
     private PaymentDTO payment;
+    private String merchantOrderId;
 
-    private LocalDateTime createdAt, updatedAt;
+
 }

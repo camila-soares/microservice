@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static java.lang.String.format;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,7 +20,7 @@ public class QualificacaoServiceImpl implements QualificacaoService {
 
     @Override
     public void processarCriacaoDePedido(OrderDTO order) {
-        State state = stateRepository.findByAcronym(order.getCustomer().getDeliveryAddress().getState());
+        State state = stateRepository.findByAcronym(order.getCustomer().getAddress().getState());
 
         if (state != null) {
             output.pedidoQualificado(order);

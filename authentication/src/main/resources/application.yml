@@ -4,6 +4,8 @@ server:
     context-path: /auth
 
 spring:
+  main:
+    web-application-type: servlet
   application:
     name: auth
   datasource:
@@ -22,16 +24,18 @@ spring:
 
 
 
-#security:
-#  jwt:
-#    token:
-#      security-key: VGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBmb3IgdGVzdA==
-#      expire-length: 360000
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: eHk10qTbSU9zJY7lCi+sIOL5BJVwN/JRSQByqvgb2ibOVwSINnCBiKXMYx/Zj2xhsbm+QULnUUtvATDjzC1Oag==
+          validity: 3600000
 
 eureka:
   instance:
     hostname: localhost
   client:
+    register-with-eureka: true
+    fetch-registry: true
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/

@@ -1,81 +1,73 @@
 package com.microservice.authentication.security;
 
 import com.microservice.authentication.entity.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
+    @Value("${spring.security.oauth2.resourceserver.jwt.secret}")
+    private String base64Key;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.validity}")
+    private long validityInMs;
+
     private final UserDetailsService userDetailsService;
 
-    public static final int EXPIRATION = 360000000;
-    LocalDateTime dateHourExpiration = LocalDateTime.now().plusMinutes(EXPIRATION);
-    Instant instant = dateHourExpiration.atZone(ZoneId.systemDefault()).toInstant();
-    Date data = Date.from(instant);
 
-    String hourExpirationToken = dateHourExpiration.withHour(22).format(DateTimeFormatter.ofPattern("HH:mm"));
-
-    private static final String SECRET = "eHk10qTbSU9zJY7lCi+sIOL5BJVwN/JRSQByqvgb2ibOVwSINnCBiKXMYx/Zj2xhsbm+QULnUUtvATDjzC1Oag==";
-
-    String secret = Base64.getEncoder().encodeToString(SECRET.getBytes());
-
-
+    private JwtParser parser;
+    @PostConstruct
+    public void init() {
+         parser = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Key)))
+                .build();
+    }
 
     public String createToken(User user) {
 
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + validityInMs);
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("id", user.getId())
-                .claim("role", user.getUserRole())
-                .setExpiration(data)
-                .claim("ExpirationHours", hourExpirationToken)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .claim("roles", user.getUserRole().name())
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(SignatureAlgorithm.HS512, base64Key)
                 .compact();
     }
 
+
     public Claims getClims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
+                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Key)))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    public List<String> getRoles(String token) {
-        Object roles = getClims(token).get("roles");
-        if (roles instanceof List<?>){
-            return ((List<String>) roles).stream().map(Objects::toString).collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
+//    public List<String> getRoles(String token) {
+//        Object roles = getClims(token).get("roles");
+//        if (roles instanceof List<?>)
+//            return ((List<String>) roles).stream().map(Objects::toString).collect(Collectors.toList());
+//        return Collections.emptyList();
+//    }
 
     public Authentication getAuth(String token) {
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUserName(token));
@@ -93,7 +85,7 @@ public class JwtTokenProvider {
 
     public String getUserName(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
+                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Key)))
                 .build()
                 .parseClaimsJws(token)
                 .getBody().getSubject();
@@ -107,15 +99,18 @@ public class JwtTokenProvider {
         return null;
     }
 
+//    public Jws<Claims> parseToken(String token) {
+//        return Jwts.parserBuilder()
+//                .setSigningKey(key)
+//                .build()
+//                .parseClaimsJws(token);
+//    }
 
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claimsJwts = Jwts
-                    .parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
-                    .build()
-                    .parseClaimsJws(token);
-            return !claimsJwts.getBody().getExpiration().before(new Date());
+            Jws<Claims> jws = parser.parseClaimsJws(token);
+
+            return jws.getBody().getExpiration().after(new Date());
         } catch (JwtException | IllegalArgumentException exception) {
             return false;
         }

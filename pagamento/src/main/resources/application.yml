@@ -7,9 +7,9 @@ spring:
   application:
     name: pagamento
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -23,19 +23,61 @@ spring:
     password: 123456
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USERNAME:guest}
+    password: ${RABBIT_PASSWORD:guest}
 
-pagamento:
-  rabbitmq:
-    exchange: pedido.exchange
-    queue: pedido.queue
+    # https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream-binder-rabbit.html#_rabbitmq_consumer_properties
+  cloud:
+    function:
+      definition: pedidoConfirmado;
+    stream:
+      bindings:
+        pedidoConfirmado-in-0:
+            destination: pedido-confirmado
+            group: pagamento
+
+        pagamentoNegado-out-0:
+            destination: pagamento-negado
+        pagamentoAutorizado-out-0:
+            destination: pagamento-autorizado
+      rabbit:
+        bindings:
+            # CONSUMER
+            pedidoConfirmado-in-0:
+              consumer:
+                exchangeType: fanout
+                autoBindDlq: true
+                deadLetterExchange: pagamento-processing-error
+                deadLetterExchangeType: fanout
+                dlqMaxLength: 100
+                dlqTtl: 120000
+
+            # PRODUCER
+            pagamentoNegado-out-0:
+              producer:
+                exchangeType: fanout
+            pagamentoAutorizado-out-0:
+              producer:
+                exchangeType: fanout
+      binders:
+        rabbitmq:
+          type: rabbit
+          environment:
+            spring:
+               rabbitmq:
+                host: ${RABBIT_HOST:localhost}
+                port: ${RABBIT_PORT:5672}
+                username: ${RABBIT_USERNAME:guest}
+                password: ${RABBIT_PASSWORD:guest}
+                virtual-host: /
 
 eureka:
   instance:
     hostname: localhost
   client:
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka/

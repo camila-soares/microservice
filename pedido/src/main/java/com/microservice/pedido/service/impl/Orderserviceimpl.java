@@ -1,10 +1,9 @@
 package com.microservice.pedido.service.impl;
 
+import com.microservice.commons.dtos.*;
 import com.microservice.commons.enums.OrderStatus;
 import com.microservice.pedido.broker.OrderOutput;
-import com.microservice.pedido.model.Item;
-import com.microservice.pedido.model.Order;
-import com.microservice.pedido.model.Payment;
+import com.microservice.pedido.model.*;
 import com.microservice.pedido.repository.OderRepository;
 import com.microservice.pedido.repository.ProductRepository;
 import com.microservice.pedido.service.OderService;
@@ -29,14 +28,15 @@ public class Orderserviceimpl implements OderService {
 
     @Override
     public Order create(Order order) {
-        List<Item> items = getItems(order);
-        order.setItems(items);
+        order.setItems(order.getItems());
         order.calcularValorTotal();
         oderRepository.save(order);
         orderOutput.pedidoCriado(order);
         log.info("[{}] Pedido Criado", order.getId());
         return order;
     }
+
+
 
     @Override
     public Order findById(String id) {
@@ -45,7 +45,13 @@ public class Orderserviceimpl implements OderService {
     }
 
     @Override
+    public List<Order> findByEmail(String email) {
+        return oderRepository.findByCustomerEmail(email);
+    }
+
+    @Override
     public void processarReservaDePedido(String orderId) {
+
         oderRepository.reserve(orderId);
        Order order = oderRepository.findById(orderId).orElseThrow(() ->
                new RuntimeException("Order not found"));
@@ -78,7 +84,7 @@ public class Orderserviceimpl implements OderService {
         oderRepository.updatePagameto(orderId, payment);
         oderRepository.updateByStatus(OrderStatus.in_preparation, orderId, updateAt);
 
-        log.info("[{}] Pagamento Autorizado :(", orderId);
+        log.info("[{}] Pagamento Autorizado :)", orderId);
     }
 
     @Override
@@ -113,15 +119,4 @@ public class Orderserviceimpl implements OderService {
         log.info("[{}] Pedido Confirmado", orderId);
     }
 
-    private @NotNull List<Item> getItems(Order order) {
-        List<Item> items = new ArrayList<>();
-        for (Item item : order.getItems()) {
-            var product = productRepository.findById(item.getProductId());
-            item.setProductId(product.get().getId());
-            item.setCount(order.getItems().get(0).getCount());
-            item.setPrice(order.getItems().get(0).getPrice());
-            items.add(item);
-        }
-        return items;
-    }
 }

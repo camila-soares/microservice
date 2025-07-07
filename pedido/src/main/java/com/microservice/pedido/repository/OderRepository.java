@@ -12,10 +12,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Transactional
 @Repository
 public interface OderRepository extends JpaRepository<Order, String> {
+
+
+    List<Order> findByCustomerEmail(String email);
 
     @Modifying
     @Query("update Order o set o.reserved = true where o.id = ?1")
@@ -31,7 +35,8 @@ public interface OderRepository extends JpaRepository<Order, String> {
 
 
 
+    @Transactional
     @Modifying
-    @Query("update Order set payment = ?2 where id = ?1")
-    Order updatePagameto(String orderId, Payment payment);
+    @Query("update Order o set o.payment = :payment where o.id = :orderId ")
+    void updatePagameto(@Param("orderId") String orderId,@Param("payment") Payment payment);
 }

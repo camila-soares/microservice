@@ -19,9 +19,19 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <version>4.1.100.Final</version>
+            <classifier>osx-aarch_64</classifier>
+        </dependency>
+        <dependency>
             <groupId>com.microservice</groupId>
             <artifactId>commons</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -114,6 +124,24 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <profiles>
+        <profile>
+            <id>mac-native</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-resolver-dns-native-macos</artifactId>
+                    <version>4.1.100.Final</version>
+                    <classifier>osx-aarch_64</classifier> <!-- ou osx-x86_64 -->
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>

@@ -24,7 +24,7 @@ spring:
       bindings:
         pedidoCriado-in-0:
           destination: pedido-criado
-          group: qualificacao-ms
+          group: qualificacao
 
         pedidoQualificado-out-0:
           destination: pedido-qualificado

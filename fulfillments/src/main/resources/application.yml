@@ -1,0 +1,67 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /fulfillments
+
+spring:
+  application:
+    name: fulfillments
+  data:
+    mongodb:
+      uri: ${MONGODB_CONNECTION_URL:mongodb://root:example@localhost:27017/fulfillments?authSource=admin}
+
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: eHk10qTbSU9zJY7lCi+sIOL5BJVwN/JRSQByqvgb2ibOVwSINnCBiKXMYx/Zj2xhsbm+QULnUUtvATDjzC1Oag==
+  # https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream-binder-rabbit.html#_rabbitmq_consumer_properties
+  cloud:
+      function:
+        definition: pagamentoAutorizado;
+      stream:
+        bindings:
+          pagamentoAutorizado-in-0:
+            destination: pagamento-autorizado
+            group: fulfillment-ms
+
+          pedidoEmbalado-out-0:
+            destination: pedido-embalado
+        rabbit:
+          bindings:
+            # CONSUMER
+            pagamentoAutorizado-in-0:
+              consumer:
+                exchangeType: fanout
+                autoBindDlq: true
+                deadLetterExchange: fulfillment-processing-error
+                deadLetterExchangeType: fanout
+                dlqMaxLength: 100
+                dlqTtl: 120000
+
+            # PRODUCER
+            pedidoEmbalado-out-0:
+              producer:
+                exchangeType: fanout
+        binders:
+          rabbitmq:
+            type: rabbit
+            environment:
+              spring:
+                rabbitmq:
+                  host: ${RABBIT_HOST:localhost}
+                  port: ${RABBIT_PORT:5672}
+                  username: ${RABBIT_USERNAME:guest}
+                  password: ${RABBIT_PASSWORD:guest}
+                  virtual-host: /
+
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

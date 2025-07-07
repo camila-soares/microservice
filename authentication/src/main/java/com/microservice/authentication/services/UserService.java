@@ -60,4 +60,12 @@ public class UserService implements UserDetailsService {
         return user;
 
     }
+
+    public void updateUser(Long id, UserDTO userDTO) {
+       User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user = User.builder().email(userDTO.getEmail())
+                        .firstName(userDTO.getFirstName())
+                                .lastName(userDTO.getLastName()).build();
+        userRepository.updateUser(id, user.getEmail(), user.getFirstName(), user.getLastName());
+    }
 }
